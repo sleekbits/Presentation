@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  backend:
+    build: ./backend
+    environment:
+      APP_TOKEN: ${APP_TOKEN:-change-me}
+      TEMP_DIR: /tmp/pptx-jobs
+      MAX_UPLOAD_MB: 20
+      FILE_TTL_MINUTES: 60
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_tmp:/tmp/pptx-jobs
+
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+      NEXT_PUBLIC_APP_TOKEN: ${APP_TOKEN:-change-me}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  backend_tmp:
